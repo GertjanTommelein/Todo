@@ -8,8 +8,9 @@ function test() {
 
 
 // Storing todoListsArray into localStorage.
-var todoListsArray = ["Hello"];
-
+var todoListsArray = [];
+var ids = [];
+//X let id = 0;
 
 // initializing variables.
 let input = document.getElementById("inputtext");
@@ -28,15 +29,28 @@ buttonAdd.addEventListener("click", add);
 
 
 function add() {
+    // check for empty field.
+    if(input.value == ""){
+        alert("You have to enter something");
+        return false;
+    }
     // custom made localStorage retrieve and convert to array.
     let todoListsStorageGet = localStorage.getItem("todoLists");
     todoListsArray = JSON.parse(todoListsStorageGet);
     if(!todoListsArray) {
         todoListsArray = [];
     }
+    // Retrieve the idsStorage and convert to array.
+    //X   getIds();
     // add the todo text to the array.
     console.log(todoListsArray);
     todoListsArray.push(input.value);
+    // add an id to the ids array.
+    
+    //X    ids.push(id)
+    //X    id++;
+    // convert the ids array to a string and add it to the IdsStorage.
+    //X    saveIds();
     // convert the array to a string and add it to the todoLists.
     saveTodos();
     //Create Card.
@@ -45,9 +59,12 @@ function add() {
     let newText = document.createTextNode(input.value);
     let newCard = document.createElement("div");
     let newLabel = document.createElement("label");
+    let newP = document.createElement("p");
     let newCheck = document.createElement("input");
     let newDeleteButton = document.createElement("div");
     let todoBox = document.getElementById("todobox");
+    newP.setAttribute("class", "todo-text");
+    newLabel.setAttribute("class", "todo-label");
     newCheck.setAttribute("type","checkbox");
     newCard.setAttribute("class", "todo-card");
     // Assigns a id to every New To do Card.
@@ -55,12 +72,16 @@ function add() {
     newDeleteButton.setAttribute("class", "delete-button");
     newDeleteButton.setAttribute("id", num);
     newDeleteButton.addEventListener("click", deleteTodos);
-    newLabel.appendChild(newText);
+    newP.appendChild(newText);
+    newLabel.appendChild(newP);
     newCard.appendChild(newCheck);
     newCard.appendChild(newLabel);
     newCard.appendChild(newDeleteButton);
     todoBox.appendChild(newCard);
   
+    // Reset input.value to ""
+    input.value = "";
+    input.focus();
 }
 
 
@@ -80,19 +101,39 @@ function getTodos() {
 }
 
 // delete todos.
-function deleteTodos(id) {
+function deleteTodos() {
+    // grabs the string of <p>
+    let itemId = this.parentNode.childNodes[1].childNodes[0].innerHTML;
+    // finds the indexOf <p> string
+    let index = todoLists.indexOf(itemId);
+    console.log(index);
+    console.log(itemId);
+    //X   getIds();
+    //let id = this.parentNode.id
     let todoItem = this.parentNode;
     let todoParent= todoItem.parentNode;
     todoParent.removeChild(todoItem);
     console.log("todoItem");
     getTodos();
-   todoLists.splice(id, 1);
+   todoLists.splice(index, 1);
+   
     
 
    todoListsArray = todoLists;
     saveTodos();
     getTodos();
 }
+/*function saveIds(){
+    localStorage.setItem("idsStorage", JSON.stringify(ids));
+}
+function getIds(){
+  let idsStorage = localStorage.getItem("idsStorage");
+  ids = JSON.parse(idsStorage);
+    if(!ids) {
+        ids = [];
+    }
+
+}*/
 
 getTodos();
 listTodos();
@@ -105,17 +146,21 @@ function listTodos() {
         let newText = document.createTextNode(todoListsArray);
         let newCard = document.createElement("div");
         let newLabel = document.createElement("label");
+        let newP = document.createElement("p");
         let newCheck = document.createElement("input");
         let newDeleteButton = document.createElement("div");
         let todoBox = document.getElementById("todobox");
         newDeleteButton.setAttribute("class", "delete-button");
         newDeleteButton.setAttribute("id", i);
         newDeleteButton.addEventListener("click", deleteTodos);
+        newP.setAttribute("class", "todo-text");
+        newLabel.setAttribute("class", "todo-label");
         newCheck.setAttribute("type","checkbox");
         newCard.setAttribute("class", "todo-card");
         // assigns a id to every To do Card.
         newCard.setAttribute("id", i);
-        newLabel.appendChild(newText);
+        newP.appendChild(newText);
+        newLabel.appendChild(newP);
         newCard.appendChild(newCheck);
         newCard.appendChild(newLabel);
         newCard.appendChild(newDeleteButton);

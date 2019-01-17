@@ -1,16 +1,7 @@
-
-/* TODO create this function for deleteButton.
-function test() {
-    var item = this.parentNode; (item is the button.)
-    var parent = item.parentNode; (parent is the todoCard.)
-    parent.removeChild(item);
-    }*/
-
-
-// Storing todoListsArray into localStorage.
+// Initializing arrays.
 var todoListsArray = [];
-var ids = [];
-//X let id = 0;
+var checkBoxesArray = [];
+
 
 // initializing variables.
 let input = document.getElementById("inputtext");
@@ -18,11 +9,18 @@ let todoCard = document.getElementById("todo-card");
 let checkbox = document.getElementById("checkBox");
 let buttonAdd = document.getElementById("add");
 let todoBox = document.getElementById("todobox");
+let checkBox = document.getElementsByClassName("checkBox");
 
 
 
 // add button functionality.
 buttonAdd.addEventListener("click", add);
+input.addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if(event.keyCode === 13) {
+        document.getElementById("add").click();
+    }
+});
 
 
 
@@ -40,17 +38,9 @@ function add() {
     if(!todoListsArray) {
         todoListsArray = [];
     }
-    // Retrieve the idsStorage and convert to array.
-    //X   getIds();
     // add the todo text to the array.
     console.log(todoListsArray);
     todoListsArray.push(input.value);
-    // add an id to the ids array.
-    
-    //X    ids.push(id)
-    //X    id++;
-    // convert the ids array to a string and add it to the IdsStorage.
-    //X    saveIds();
     // convert the array to a string and add it to the todoLists.
     saveTodos();
     //Create Card.
@@ -63,6 +53,7 @@ function add() {
     let newCheck = document.createElement("input");
     let newDeleteButton = document.createElement("div");
     let todoBox = document.getElementById("todobox");
+    newCheck.setAttribute("class", "checkBox");
     newP.setAttribute("class", "todo-text");
     newLabel.setAttribute("class", "todo-label");
     newCheck.setAttribute("type","checkbox");
@@ -72,6 +63,7 @@ function add() {
     newDeleteButton.setAttribute("class", "delete-button");
     newDeleteButton.setAttribute("id", num);
     newDeleteButton.addEventListener("click", deleteTodos);
+    newCheck.addEventListener("change", saveCheckBox);
     newP.appendChild(newText);
     newLabel.appendChild(newP);
     newCard.appendChild(newCheck);
@@ -85,13 +77,13 @@ function add() {
 }
 
 
-    // convert the array to a string and then add the string to todoLists. 
+    // convert the todoListsArray to a string and then add that string to todoLists in localStorage. 
 function saveTodos() {
         let todoListsStorage = JSON.stringify(todoListsArray);
        localStorage.setItem("todoLists", todoListsStorage);
     }
     
-    // retrieve the todoLists and convert them to an array.
+    // retrieve the todoLists from localStorage and convert them back to an array.
 function getTodos() {
    let todoListsStorageGet = localStorage.getItem("todoLists");
       todoLists = JSON.parse(todoListsStorageGet);
@@ -108,33 +100,49 @@ function deleteTodos() {
     let index = todoLists.indexOf(itemId);
     console.log(index);
     console.log(itemId);
-    //X   getIds();
-    //let id = this.parentNode.id
     let todoItem = this.parentNode;
     let todoParent= todoItem.parentNode;
     todoParent.removeChild(todoItem);
     console.log("todoItem");
     getTodos();
+    getCheckBox();
    todoLists.splice(index, 1);
+   checkBoxesArray.splice(index, 1);
    
     
 
    todoListsArray = todoLists;
+   saveCheckBox();
     saveTodos();
     getTodos();
 }
-/*function saveIds(){
-    localStorage.setItem("idsStorage", JSON.stringify(ids));
-}
-function getIds(){
-  let idsStorage = localStorage.getItem("idsStorage");
-  ids = JSON.parse(idsStorage);
-    if(!ids) {
-        ids = [];
+    // Saves the value of the checkboxes. 
+function saveCheckBox(){
+    checkBoxesArray = [];
+    
+    for(let i=0; i < todoLists.length; i++) {
+        if(checkBox[i].checked == true) {
+        checkBoxesArray.push(true);
+      }else {
+          checkBoxesArray.push(false);
+      }  
     }
+    
+    let checkBoxesStorage = JSON.stringify(checkBoxesArray);
+       checkBoxesArray = localStorage.setItem("checkboxes", checkBoxesStorage);
+       console.log("it works");
+}
+    // Gets the values of the checkboxes.
+function getCheckBox(){
+    
+    let getCheckBox = localStorage.getItem("checkboxes");
+    checkBoxesArray = JSON.parse(getCheckBox);
+    if(!checkBoxesArray) {
+        checkBoxesArray = [];
+    }
+}
 
-}*/
-
+getCheckBox();
 getTodos();
 listTodos();
 // loop that assigns all the todoLists items to their own card.
@@ -150,15 +158,19 @@ function listTodos() {
         let newCheck = document.createElement("input");
         let newDeleteButton = document.createElement("div");
         let todoBox = document.getElementById("todobox");
+        newCheck.setAttribute("class", "checkBox");
         newDeleteButton.setAttribute("class", "delete-button");
         newDeleteButton.setAttribute("id", i);
         newDeleteButton.addEventListener("click", deleteTodos);
+        newCheck.addEventListener("change", saveCheckBox);
         newP.setAttribute("class", "todo-text");
         newLabel.setAttribute("class", "todo-label");
         newCheck.setAttribute("type","checkbox");
         newCard.setAttribute("class", "todo-card");
         // assigns a id to every To do Card.
         newCard.setAttribute("id", i);
+        // assigns a true or false value to the checkboxes.
+        newCheck.checked = checkBoxesArray[i];
         newP.appendChild(newText);
         newLabel.appendChild(newP);
         newCard.appendChild(newCheck);
